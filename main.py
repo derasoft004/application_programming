@@ -60,64 +60,21 @@ if not os.path.exists('dataset/tiger'): os.mkdir('dataset/tiger')
 if not os.path.exists('dataset/leopard'): os.mkdir('dataset/leopard')
 
 
+def make_name(value):
+    return '0'*(4-len(str(value))) + str(value)
 def save_pictures():
     global full_list_tiger, full_list_leopard
     directory_tiger, directory_leopard = "dataset/tiger", "dataset/leopard"
     print(f'lens: {len(full_list_tiger)}, {len(full_list_leopard)}')
     for elem in range(len(full_list_tiger)):
         img = urllib.request.urlopen(full_list_tiger[elem].get_attribute('src')).read()
-        out = open(f"{directory_tiger}/image{elem}.jpg", "wb")
+        out = open(f"{directory_tiger}/{make_name(elem)}.jpg", "wb")
         out.write(img)
         out.close
     for elem in range(len(full_list_leopard)):
         img2 = urllib.request.urlopen(full_list_leopard[elem].get_attribute('src')).read()
-        out = open(f"{directory_leopard}/image{elem}.jpg", "wb")
+        out = open(f"{directory_leopard}/{make_name(elem)}.jpg", "wb")
         out.write(img2)
         out.close
 
 save_pictures()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
