@@ -85,12 +85,44 @@ def main():
     save_pictures()
 
 
-def annotation_maker():
-    with open('dataset/annotation.csv', 'w', newline='') as csvfile:
+def list_dataset(animal):
+    return [f'{os.getcwd()}/dataset/{animal}/{x}' for x in os.listdir(f'dataset/{animal}')], [f'dataset/{animal}/{x}' for x in os.listdir(f'dataset/{animal}')]
+
+
+# def get_length(element):
+#     return int(element.split('.')[0])
+# def get_length_after_split(element):
+#     return int(element.split('/')[-1].split('.')[0])
+# def sort_path_list(path_list: list, type_):
+#     if type_: return path_list.sort(key=get_length)
+#     else: return path_list.sort(key=get_length_after_split)
+
+
+def loop_for_writing(csvfile, full_list_: list, list_: list,  animal):
+    for i in range(len(list_)):
+        csvfile.writerow({'Full path': full_list_[i], 'Relative path': list_[i], 'class': animal})
+
+
+def open_and_write(animal, listf, listr):
+    with open(f'dataset/{animal}/annotation.csv', 'w', newline='') as csvfile:
         fieldnames = ['Full path', 'Relative path', 'class']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()
+        loop_for_writing(writer, listf, listr, animal)
+
+
+def annotation_maker():
+    tig, leo = 'tiger', 'leopard'
+    list_relative_path_images_tiger, list_relative_path_images_leopard = \
+        list_dataset(tig)[1], list_dataset(leo)[1]
+    list_full_path_images_tiger, list_full_path_images_leopard = \
+        list_dataset(tig)[0], list_dataset(leo)[0]
+    # open_and_write(tig, list_full_path_images_tiger, list_relative_path_images_tiger)
+    # open_and_write(leo, list_full_path_images_leopard, list_relative_path_images_leopard)
+
+
+
 
 
 if __name__ == "__main__":
