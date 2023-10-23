@@ -98,18 +98,11 @@ def list_dataset(animal):
 #     else: return path_list.sort(key=get_length_after_split)
 
 
-def loop_for_writing(csvfile, full_list_: list, list_: list,  animal):
-    for i in range(len(list_)):
-        csvfile.writerow({'Full path': full_list_[i], 'Relative path': list_[i], 'class': animal})
-
-
-def open_and_write(animal, listf, listr):
-    with open(f'dataset/{animal}/annotation.csv', 'w', newline='') as csvfile:
-        fieldnames = ['Full path', 'Relative path', 'class']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
-        writer.writeheader()
-        loop_for_writing(writer, listf, listr, animal)
+def loop_for_writing(csvfile, full_list_t: list, list_t: list,
+                     full_list_l: list, list_l: list, t, l):
+    for i in range(max(len(list_t), len(list_l))):
+        if i < len(list_t): csvfile.writerow({'Full path': full_list_t[i], 'Relative path': list_t[i], 'class': t})
+        if i < len(list_l): csvfile.writerow({'Full path': full_list_l[i], 'Relative path': list_l[i], 'class': l})
 
 
 def annotation_maker():
@@ -120,7 +113,14 @@ def annotation_maker():
         list_dataset(tig)[0], list_dataset(leo)[0]
     # open_and_write(tig, list_full_path_images_tiger, list_relative_path_images_tiger)
     # open_and_write(leo, list_full_path_images_leopard, list_relative_path_images_leopard)
+    with open(f'dataset/annotation.csv', 'w', newline='') as csvfile:
+        fieldnames = ['Full path', 'Relative path', 'class']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
+        writer.writeheader()
+        loop_for_writing(writer, list_full_path_images_tiger, list_relative_path_images_tiger,
+                         list_full_path_images_leopard, list_relative_path_images_leopard,
+                         tig, leo)
 
 
 
