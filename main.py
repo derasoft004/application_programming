@@ -3,6 +3,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import urllib.request
+import csv
 
 
 def driver_scroller(driver_to_scroll, pix):
@@ -46,25 +47,20 @@ def make_driver_with_link(link, path_name, animal):
     print(len(full_list_tiger), len(full_list_leopard))
 
 
-for i in range(5):
-    if len(full_list_tiger) <= 1000:
-        make_driver_with_link(URLs_tiger[i], "//img[@class='serp-item__thumb justifier__thumb']", "tiger")
-        time.sleep(10)
-    if len(full_list_leopard) <= 1000:
-        make_driver_with_link(URLs_leopard[i], "//img[@class='serp-item__thumb justifier__thumb']", "leopard")
-        time.sleep(10)
-
-
-if not os.path.exists('dataset'): os.mkdir('dataset')
-if not os.path.exists('dataset/tiger'): os.mkdir('dataset/tiger')
-if not os.path.exists('dataset/leopard'): os.mkdir('dataset/leopard')
-
-
 def make_name(value):
     return '0'*(4-len(str(value))) + str(value)
+
+
+def directory_maker(directory_tiger, directory_leopard):
+    if not os.path.exists('dataset'): os.mkdir('dataset')
+    if not os.path.exists(directory_tiger): os.mkdir(directory_tiger)
+    if not os.path.exists(directory_leopard): os.mkdir(directory_leopard)
+
+
 def save_pictures():
     global full_list_tiger, full_list_leopard
     directory_tiger, directory_leopard = "dataset/tiger", "dataset/leopard"
+    directory_maker(directory_tiger, directory_leopard)
     print(f'lens: {len(full_list_tiger)}, {len(full_list_leopard)}')
     for elem in range(len(full_list_tiger)):
         img = urllib.request.urlopen(full_list_tiger[elem].get_attribute('src')).read()
@@ -77,4 +73,48 @@ def save_pictures():
         out.write(img2)
         out.close
 
-save_pictures()
+
+def main():
+    for i in range(5):
+        if len(full_list_tiger) <= 1000:
+            make_driver_with_link(URLs_tiger[i], "//img[@class='serp-item__thumb justifier__thumb']", "tiger")
+            time.sleep(10)
+        if len(full_list_leopard) <= 1000:
+            make_driver_with_link(URLs_leopard[i], "//img[@class='serp-item__thumb justifier__thumb']", "leopard")
+            time.sleep(10)
+    save_pictures()
+
+
+def annotation_maker():
+    with open('dataset/annotation.csv', 'w', newline='') as csvfile:
+        fieldnames = ['Full path', 'Relative path', 'class']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        writer.writeheader()
+
+
+if __name__ == "__main__":
+    annotation_maker()
+    # main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
