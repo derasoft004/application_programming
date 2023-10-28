@@ -1,4 +1,5 @@
 import os
+import shutil
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -123,10 +124,21 @@ def annotation_maker():
                          tig, leo)
 
 
+def copy_dataset(animal):
+    dataset_path, new_dataset = f"dataset/{animal}", "new_dataset"
+    if not os.path.exists(new_dataset):
+        os.mkdir(new_dataset)
+
+    image_list = os.listdir(dataset_path)
+    for image in image_list:
+        new_filename = f"{animal}_{image.split('.')[0]}.jpg"
+        shutil.copy(f'{dataset_path}/{image}', f'{new_dataset}/{new_filename}')
 
 
 if __name__ == "__main__":
-    annotation_maker()
+    copy_dataset('tiger')
+    copy_dataset('leopard')
+    # annotation_maker()
     # main()
 
 
