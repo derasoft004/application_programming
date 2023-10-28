@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 import urllib.request
 import csv
 
+tig, leo = 'tiger', 'leopard'
 
 def driver_scroller(driver_to_scroll, pix):
     sroll_range = 0
@@ -75,7 +76,7 @@ def save_pictures():
         out.close
 
 
-def main():
+def main_first():
     for i in range(5):
         if len(full_list_tiger) <= 1000:
             make_driver_with_link(URLs_tiger[i], "//img[@class='serp-item__thumb justifier__thumb']", "tiger")
@@ -84,19 +85,11 @@ def main():
             make_driver_with_link(URLs_leopard[i], "//img[@class='serp-item__thumb justifier__thumb']", "leopard")
             time.sleep(10)
     save_pictures()
+    annotation_maker('dataset/annotation.csv')
 
 
 def list_dataset(animal):
     return [f'{os.getcwd()}/dataset/{animal}/{x}' for x in os.listdir(f'dataset/{animal}')], [f'dataset/{animal}/{x}' for x in os.listdir(f'dataset/{animal}')]
-
-
-# def get_length(element):
-#     return int(element.split('.')[0])
-# def get_length_after_split(element):
-#     return int(element.split('/')[-1].split('.')[0])
-# def sort_path_list(path_list: list, type_):
-#     if type_: return path_list.sort(key=get_length)
-#     else: return path_list.sort(key=get_length_after_split)
 
 
 def loop_for_writing(csvfile, full_list_t: list, list_t: list,
@@ -106,40 +99,44 @@ def loop_for_writing(csvfile, full_list_t: list, list_t: list,
         if i < len(list_l): csvfile.writerow({'Full path': full_list_l[i], 'Relative path': list_l[i], 'class': l})
 
 
-def annotation_maker():
-    tig, leo = 'tiger', 'leopard'
+def annotation_maker(path: str):
+    global tig, leo
     list_relative_path_images_tiger, list_relative_path_images_leopard = \
         list_dataset(tig)[1], list_dataset(leo)[1]
     list_full_path_images_tiger, list_full_path_images_leopard = \
         list_dataset(tig)[0], list_dataset(leo)[0]
-    # open_and_write(tig, list_full_path_images_tiger, list_relative_path_images_tiger)
-    # open_and_write(leo, list_full_path_images_leopard, list_relative_path_images_leopard)
-    with open(f'dataset/annotation.csv', 'w', newline='') as csvfile:
+    with open(path, 'w', newline='') as csvfile:
         fieldnames = ['Full path', 'Relative path', 'class']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
         writer.writeheader()
         loop_for_writing(writer, list_full_path_images_tiger, list_relative_path_images_tiger,
                          list_full_path_images_leopard, list_relative_path_images_leopard,
                          tig, leo)
 
 
-def copy_dataset(animal):
+def copy_dataset(animal): # по animal копируется все содержимое в new_dataset
     dataset_path, new_dataset = f"dataset/{animal}", "new_dataset"
     if not os.path.exists(new_dataset):
         os.mkdir(new_dataset)
 
     image_list = os.listdir(dataset_path)
     for image in image_list:
-        new_filename = f"{animal}_{image.split('.')[0]}.jpg"
-        shutil.copy(f'{dataset_path}/{image}', f'{new_dataset}/{new_filename}')
+        shutil.copy(f'{dataset_path}/{image}', f'{new_dataset}/{animal}_{image.split(".")[0]}.jpg')
+
+
+def main_second():
+    copy_dataset(tig)
+    copy_dataset(leo)
+    annotation_maker('new_dataset/1new_dataset_annotation.csv')
 
 
 if __name__ == "__main__":
-    copy_dataset('tiger')
-    copy_dataset('leopard')
-    # annotation_maker()
-    # main()
+    # main_first()
+
+    main_second()
+
+
+
 
 
 
