@@ -146,6 +146,19 @@ def copy_dataset_rand(new_dataset: str, path: str):
                 writer.writerow({'Full path': full_path_animal, 'Relative path': relative_path_animal, 'class': animal})
 
 
+count_t, count_l = 0, 0
+def return_next(animal) -> str:
+    global count_t, count_l
+    if animal == tig:
+        rstr = f'{os.getcwd()}/dataset/{animal}/{make_name(count_t)}'
+        count_t += 1
+    elif animal == leo:
+        rstr = f'{os.getcwd()}/dataset/{animal}/{make_name(count_l)}'
+        count_l += 1
+    return rstr
+
+
+
 def main_second():
     """1"""
     # annotation_maker('dataset', 'annotation.csv', tig + '/', leo + '/')
@@ -154,7 +167,17 @@ def main_second():
     # copy_dataset(leo, 'new_dataset_task_2')
     # annotation_maker('new_dataset_task_2', '0new_dataset_annotation.csv', '', '')
     """3"""
-    copy_dataset_rand('new_dataset_task_3', '0new_dataset_annotation.csv')
+    # copy_dataset_rand('new_dataset_task_3', '0new_dataset_annotation.csv')
+    """4"""
+    print(return_next(tig))
+    print(return_next(tig))
+    print(return_next(tig))
+    print(return_next(leo))
+    print(return_next(tig))
+    print(return_next(leo))
+    print(return_next(leo))
+
+
 
 
 
