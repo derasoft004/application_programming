@@ -160,6 +160,26 @@ def return_next(animal):
     return f'{os.getcwd()}/dataset/{animal}/{rstr}.jpg'
 
 
+class Iterator:
+    def __init__(self, animal_list, lim):
+        self.animal_list = animal_list
+        self.lim = lim
+        self.count = 0
+
+    def __next__(self):
+        if self.count < self.lim:
+            self.count += 1
+            return f'{os.getcwd()}/dataset/{tig}'+self.animal_list[self.count - 1]
+        else:
+            raise StopIteration
+
+# photos = Iterator(lst, 7)
+#
+# try:
+#     print(next(photos))
+# except StopIteration:
+#     print("it's all")
+
 
 def main_second():
     """1"""
@@ -171,35 +191,23 @@ def main_second():
     """3"""
     # copy_dataset_rand('new_dataset_task_3', '0new_dataset_annotation.csv')
     """4"""
-    for i in range(1210):
-        print(return_next(tig))
-    for i in range(5):
-        print(return_next(leo))
+    # for i in range(1210):
+    #     print(return_next(tig))
+    # for i in range(5):
+    #     print(return_next(leo))
+    """5"""
+    dir_t, dir_l = f'{os.getcwd()}/dataset/{tig}', f'{os.getcwd()}/dataset/{leo}'
+    iterator_tiger = Iterator(os.listdir(dir_t), len(os.listdir(dir_t)))
+    iterator_leo = Iterator(os.listdir(dir_l), len(os.listdir(dir_l)))
+    try:
+        for i in range(1210):
+            print(next(iterator_tiger))
+    except StopIteration: print(None)
+    try:
+        for i in range(5):
+            print(next(iterator_leo))
+    except StopIteration: print(None)
 
-
-
-
-
-
-class Iterator:
-    def __init__(self, animal_list, lim):
-        self.animal_list = animal_list
-        self.lim = lim
-        self.count = 0
-
-    def __next__(self):
-        if self.count < self.lim:
-            self.count += 1
-            return self.animal_list[self.count - 1]
-        else:
-            raise StopIteration
-
-# photos = Iterator(lst, 7)
-#
-# try:
-#     print(next(photos))
-# except StopIteration:
-#     print("it's all")
 
 if __name__ == "__main__":
     main_second()
