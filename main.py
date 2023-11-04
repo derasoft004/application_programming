@@ -146,16 +146,18 @@ def copy_dataset_rand(new_dataset: str, path: str):
                 writer.writerow({'Full path': full_path_animal, 'Relative path': relative_path_animal, 'class': animal})
 
 
-def main_second():
-    """1"""
-    # annotation_maker('dataset', 'annotation.csv', tig + '/', leo + '/')
-    """2"""
-    # copy_dataset(tig, 'new_dataset_task_2')
-    # copy_dataset(leo, 'new_dataset_task_2')
-    # annotation_maker('new_dataset_task_2', '0new_dataset_annotation.csv', '', '')
-    """3"""
-    copy_dataset_rand('new_dataset_task_3', '0new_dataset_annotation.csv')
-
+count_t, count_l = 0, 0
+def return_next(animal):
+    global count_t, count_l
+    if animal == tig:
+        if count_t > len(os.listdir(f'{os.getcwd()}/dataset/{animal}')): return None
+        rstr = make_name(count_t)
+        count_t += 1
+    elif animal == leo:
+        if count_l > len(os.listdir(f'{os.getcwd()}/dataset/{animal}')): return None
+        rstr = make_name(count_l)
+        count_l += 1
+    return f'{os.getcwd()}/dataset/{animal}/{rstr}.jpg'
 
 
 class Iterator:
@@ -167,7 +169,7 @@ class Iterator:
     def __next__(self):
         if self.count < self.lim:
             self.count += 1
-            return self.animal_list[self.count - 1]
+            return f'{os.getcwd()}/dataset/{tig}'+self.animal_list[self.count - 1]
         else:
             raise StopIteration
 
@@ -177,6 +179,35 @@ class Iterator:
 #     print(next(photos))
 # except StopIteration:
 #     print("it's all")
+
+
+def main_second():
+    """1"""
+    # annotation_maker('dataset', 'annotation.csv', tig + '/', leo + '/')
+    """2"""
+    # copy_dataset(tig, 'new_dataset_task_2')
+    # copy_dataset(leo, 'new_dataset_task_2')
+    # annotation_maker('new_dataset_task_2', '0new_dataset_annotation.csv', '', '')
+    """3"""
+    # copy_dataset_rand('new_dataset_task_3', '0new_dataset_annotation.csv')
+    """4"""
+    # for i in range(1210):
+    #     print(return_next(tig))
+    # for i in range(5):
+    #     print(return_next(leo))
+    """5"""
+    dir_t, dir_l = f'{os.getcwd()}/dataset/{tig}', f'{os.getcwd()}/dataset/{leo}'
+    iterator_tiger = Iterator(os.listdir(dir_t), len(os.listdir(dir_t)))
+    iterator_leo = Iterator(os.listdir(dir_l), len(os.listdir(dir_l)))
+    try:
+        for i in range(1210):
+            print(next(iterator_tiger))
+    except StopIteration: print(None)
+    try:
+        for i in range(5):
+            print(next(iterator_leo))
+    except StopIteration: print(None)
+
 
 if __name__ == "__main__":
     main_second()
