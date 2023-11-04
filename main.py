@@ -5,6 +5,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import urllib.request
 import csv
+from random import randint
 
 tig, leo = 'tiger', 'leopard'
 
@@ -76,32 +77,6 @@ def save_pictures():
         out.close
 
 
-
-def list_dataset(dataset, animal):
-    return [f'{os.getcwd()}/{dataset}/{animal}{x}' for x in os.listdir(f'{dataset}/{animal}')], [f'{dataset}/{animal}{x}' for x in os.listdir(f'{dataset}/{animal}')]
-    # когда передаем animal - добавлять /
-
-def loop_for_writing(csvfile, full_list_t: list, list_t: list,
-                     full_list_l: list, list_l: list, t, l):
-    for i in range(max(len(list_t), len(list_l))):
-        if i < len(list_t): csvfile.writerow({'Full path': full_list_t[i], 'Relative path': list_t[i], 'class': t})
-        if i < len(list_l): csvfile.writerow({'Full path': full_list_l[i], 'Relative path': list_l[i], 'class': l})
-
-
-def annotation_maker(dataset, path: str, t, l):
-    global tig, leo
-    list_relative_path_images_tiger, list_relative_path_images_leopard = \
-        list_dataset(dataset, t)[1], list_dataset(dataset, l)[1]
-    list_full_path_images_tiger, list_full_path_images_leopard = \
-        list_dataset(dataset, t)[0], list_dataset(dataset, l)[0]
-    with open(path, 'w', newline='') as csvfile:
-        fieldnames = ['Full path', 'Relative path', 'class']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        loop_for_writing(writer, list_full_path_images_tiger, list_relative_path_images_tiger,
-                         list_full_path_images_leopard, list_relative_path_images_leopard,
-                         tig, leo)
-
 def main_first():
     def parser():
         for i in range(5):
@@ -113,11 +88,35 @@ def main_first():
                 time.sleep(10)
     # parser()
     # save_pictures()
-    annotation_maker('dataset', 'dataset/annotation.csv', tig+'/', leo+'/')
 
 
-def copy_dataset(animal): # по animal копируется все содержимое в new_dataset
-    dataset_path, new_dataset = f"dataset/{animal}", "new_dataset"
+def list_dataset(dataset, animal):
+    return [f'{os.getcwd()}/{dataset}/{animal}{x}' for x in os.listdir(f'{dataset}/{animal}')], [f'{dataset}/{animal}{x}' for x in os.listdir(f'{dataset}/{animal}')]
+    # когда передаем animal - добавлять /, если пустое - ничего не добавлять
+
+def loop_for_writing(csvfile, full_list_t: list, list_t: list,
+                     full_list_l: list, list_l: list, t: str, l: str):
+    for i in range(max(len(list_t), len(list_l))):
+        if i < len(list_t) and t in list_t[i]: csvfile.writerow({'Full path': full_list_t[i], 'Relative path': list_t[i], 'class': t})
+        if i < len(list_l) and l in list_l[i]: csvfile.writerow({'Full path': full_list_l[i], 'Relative path': list_l[i], 'class': l})
+
+
+def annotation_maker(dataset, path: str, t, l):
+    list_relative_path_images_tiger, list_relative_path_images_leopard = \
+        list_dataset(dataset, t)[1], list_dataset(dataset, l)[1]
+    list_full_path_images_tiger, list_full_path_images_leopard = \
+        list_dataset(dataset, t)[0], list_dataset(dataset, l)[0]
+    with open(dataset+'/'+path, 'w', newline='') as csvfile:
+        fieldnames = ['Full path', 'Relative path', 'class']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        loop_for_writing(writer, list_full_path_images_tiger, list_relative_path_images_tiger,
+                         list_full_path_images_leopard, list_relative_path_images_leopard,
+                         tig, leo)
+
+
+def copy_dataset(animal, new_dataset): # по dataset/{animal} собирается и копируется все содержимое в new_dataset
+    dataset_path = f"dataset/{animal}"
     if not os.path.exists(new_dataset):
         os.mkdir(new_dataset)
 
@@ -126,10 +125,37 @@ def copy_dataset(animal): # по animal копируется все содерж
         shutil.copy(f'{dataset_path}/{image}', f'{new_dataset}/{animal}_{image.split(".")[0]}.jpg')
 
 
+def copy_dataset_rand(new_dataset: str, path: str):
+    if not os.path.exists(new_dataset):
+        os.mkdir(new_dataset)
+
+    with open(new_dataset + '/' + path, 'w', newline='') as csvfile:
+        fieldnames = ['Full path', 'Relative path', 'class']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for animal in [tig, leo]:
+            dataset_path = f"dataset/{animal}"
+
+            image_list = os.listdir(dataset_path)
+            for image in image_list:
+                num = randint(0, 10000)
+                relative_path_animal = f'{new_dataset}/{num}.jpg'
+                full_path_animal = f'{os.getcwd()}/{relative_path_animal}'
+                shutil.copy(f'{dataset_path}/{image}', f'{new_dataset}/{num}.jpg')
+                writer.writerow({'Full path': full_path_animal, 'Relative path': relative_path_animal, 'class': animal})
+
+
 def main_second():
-    copy_dataset(tig)
-    copy_dataset(leo)
-    annotation_maker('new_dataset', 'new_dataset/1new_dataset_annotation.csv', '', '')
+    """1"""
+    # annotation_maker('dataset', 'annotation.csv', tig + '/', leo + '/')
+    """2"""
+    # copy_dataset(tig, 'new_dataset_task_2')
+    # copy_dataset(leo, 'new_dataset_task_2')
+    # annotation_maker('new_dataset_task_2', '0new_dataset_annotation.csv', '', '')
+    """3"""
+    copy_dataset_rand('new_dataset_task_3', '0new_dataset_annotation.csv')
+
 
 
 class Iterator:
@@ -153,8 +179,6 @@ class Iterator:
 #     print("it's all")
 
 if __name__ == "__main__":
-    # main_first()
-
     main_second()
 
 
