@@ -79,28 +79,14 @@ def save_pictures():
 
 def list_dataset(dataset, animal):
     return [f'{os.getcwd()}/{dataset}/{animal}{x}' for x in os.listdir(f'{dataset}/{animal}')], [f'{dataset}/{animal}{x}' for x in os.listdir(f'{dataset}/{animal}')]
-    # когда передаем animal - добавлять /
+    # когда передаем animal - добавлять /, если пустое - ничего не добавлять
 
 def loop_for_writing(csvfile, full_list_t: list, list_t: list,
-                     full_list_l: list, list_l: list, t, l):
+                     full_list_l: list, list_l: list, t: str, l: str):
     for i in range(max(len(list_t), len(list_l))):
-        if i < len(list_t): csvfile.writerow({'Full path': full_list_t[i], 'Relative path': list_t[i], 'class': t})
-        if i < len(list_l): csvfile.writerow({'Full path': full_list_l[i], 'Relative path': list_l[i], 'class': l})
+        if i < len(list_t) and t in list_t[i]: csvfile.writerow({'Full path': full_list_t[i], 'Relative path': list_t[i], 'class': t})
+        if i < len(list_l) and l in list_l[i]: csvfile.writerow({'Full path': full_list_l[i], 'Relative path': list_l[i], 'class': l})
 
-
-def annotation_maker(dataset, path: str, t, l):
-    global tig, leo
-    list_relative_path_images_tiger, list_relative_path_images_leopard = \
-        list_dataset(dataset, t)[1], list_dataset(dataset, l)[1]
-    list_full_path_images_tiger, list_full_path_images_leopard = \
-        list_dataset(dataset, t)[0], list_dataset(dataset, l)[0]
-    with open(path, 'w', newline='') as csvfile:
-        fieldnames = ['Full path', 'Relative path', 'class']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        loop_for_writing(writer, list_full_path_images_tiger, list_relative_path_images_tiger,
-                         list_full_path_images_leopard, list_relative_path_images_leopard,
-                         tig, leo)
 
 def main_first():
     def parser():
@@ -113,7 +99,20 @@ def main_first():
                 time.sleep(10)
     # parser()
     # save_pictures()
-    annotation_maker('dataset', 'dataset/annotation.csv', tig+'/', leo+'/')
+
+
+def annotation_maker(dataset, path: str, t, l):
+    list_relative_path_images_tiger, list_relative_path_images_leopard = \
+        list_dataset(dataset, t)[1], list_dataset(dataset, l)[1]
+    list_full_path_images_tiger, list_full_path_images_leopard = \
+        list_dataset(dataset, t)[0], list_dataset(dataset, l)[0]
+    with open(path, 'w', newline='') as csvfile:
+        fieldnames = ['Full path', 'Relative path', 'class']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        loop_for_writing(writer, list_full_path_images_tiger, list_relative_path_images_tiger,
+                         list_full_path_images_leopard, list_relative_path_images_leopard,
+                         tig, leo)
 
 
 def copy_dataset(animal): # по animal копируется все содержимое в new_dataset
@@ -126,10 +125,24 @@ def copy_dataset(animal): # по animal копируется все содерж
         shutil.copy(f'{dataset_path}/{image}', f'{new_dataset}/{animal}_{image.split(".")[0]}.jpg')
 
 
+def third_num():
+    """
+    Написать скрипт, создающий копию датасета таким образом, чтобы каждый файл из сходного датасета получил случайный
+     номер от 0 до 10000, и датасет представлял собой следующую структуру dataset/номер.jpg
+    """
+
+
+
+
 def main_second():
+    """1"""
+    annotation_maker('dataset', 'dataset/annotation.csv', tig + '/', leo + '/')
+    """2"""
     copy_dataset(tig)
     copy_dataset(leo)
     annotation_maker('new_dataset', 'new_dataset/1new_dataset_annotation.csv', '', '')
+    """3"""
+
 
 
 class Iterator:
@@ -153,8 +166,6 @@ class Iterator:
 #     print("it's all")
 
 if __name__ == "__main__":
-    # main_first()
-
     main_second()
 
 
