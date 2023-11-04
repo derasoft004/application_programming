@@ -147,15 +147,17 @@ def copy_dataset_rand(new_dataset: str, path: str):
 
 
 count_t, count_l = 0, 0
-def return_next(animal) -> str:
+def return_next(animal):
     global count_t, count_l
     if animal == tig:
-        rstr = f'{os.getcwd()}/dataset/{animal}/{make_name(count_t)}'
+        if count_t > len(os.listdir(f'{os.getcwd()}/dataset/{animal}')): return None
+        rstr = make_name(count_t)
         count_t += 1
     elif animal == leo:
-        rstr = f'{os.getcwd()}/dataset/{animal}/{make_name(count_l)}'
+        if count_l > len(os.listdir(f'{os.getcwd()}/dataset/{animal}')): return None
+        rstr = make_name(count_l)
         count_l += 1
-    return rstr
+    return f'{os.getcwd()}/dataset/{animal}/{rstr}.jpg'
 
 
 
@@ -169,13 +171,11 @@ def main_second():
     """3"""
     # copy_dataset_rand('new_dataset_task_3', '0new_dataset_annotation.csv')
     """4"""
-    print(return_next(tig))
-    print(return_next(tig))
-    print(return_next(tig))
-    print(return_next(leo))
-    print(return_next(tig))
-    print(return_next(leo))
-    print(return_next(leo))
+    for i in range(1210):
+        print(return_next(tig))
+    for i in range(5):
+        print(return_next(leo))
+
 
 
 
