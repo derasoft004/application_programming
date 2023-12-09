@@ -5,6 +5,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import urllib.request
 import csv
+from typing import Tuple, Optional
 from random import randint
 
 tig, leo = 'tiger', 'leopard'
@@ -60,7 +61,7 @@ def directory_maker(directory_tiger, directory_leopard):
     if not os.path.exists(directory_leopard): os.mkdir(directory_leopard)
 
 
-def save_pictures():
+def save_pictures() -> None:
     global full_list_tiger, full_list_leopard
     directory_tiger, directory_leopard = "dataset/tiger", "dataset/leopard"
     directory_maker(directory_tiger, directory_leopard)
@@ -77,7 +78,11 @@ def save_pictures():
         out.close
 
 
-def main_first():
+def main_first() -> None:
+    """
+    main first function is launch pages wish pictures and saves it
+    :return:
+    """
     def parser():
         for i in range(5):
             if len(full_list_tiger) <= 1000:
@@ -90,18 +95,38 @@ def main_first():
     # save_pictures()
 
 
-def list_dataset(dataset, animal):
+def list_dataset(dataset, animal) -> Tuple:
     return [f'{os.getcwd()}/{dataset}/{animal}{x}' for x in os.listdir(f'{dataset}/{animal}')], [f'{dataset}/{animal}{x}' for x in os.listdir(f'{dataset}/{animal}')]
     # когда передаем animal - добавлять /, если пустое - ничего не добавлять
 
 def loop_for_writing(csvfile, full_list_t: list, list_t: list,
-                     full_list_l: list, list_l: list, t: str, l: str):
+                     full_list_l: list, list_l: list, t: str, l: str) -> None:
+    """
+    loop for writing in csv file
+    :param csvfile:
+    :param full_list_t:
+    :param list_t:
+    :param full_list_l:
+    :param list_l:
+    :param t:
+    :param l:
+    :return:
+    """
     for i in range(max(len(list_t), len(list_l))):
         if i < len(list_t) and t in list_t[i]: csvfile.writerow({'Full path': full_list_t[i], 'Relative path': list_t[i], 'class': t})
         if i < len(list_l) and l in list_l[i]: csvfile.writerow({'Full path': full_list_l[i], 'Relative path': list_l[i], 'class': l})
 
 
-def annotation_maker(dataset, path: str, t, l):
+def annotation_maker(dataset, path: str, t, l) -> None:
+    """
+    It makes annotations for some assignments
+
+    :param dataset:
+    :param path:
+    :param t:
+    :param l:
+    :return:
+    """
     list_relative_path_images_tiger, list_relative_path_images_leopard = \
         list_dataset(dataset, t)[1], list_dataset(dataset, l)[1]
     list_full_path_images_tiger, list_full_path_images_leopard = \
@@ -115,7 +140,14 @@ def annotation_maker(dataset, path: str, t, l):
                          tig, leo)
 
 
-def copy_dataset(animal, new_dataset): # по dataset/{animal} собирается и копируется все содержимое в new_dataset
+def copy_dataset(animal, new_dataset) -> None:
+    """
+    по dataset/{animal} собирается и копируется все содержимое в new_dataset
+
+    :param animal:
+    :param new_dataset:
+    :return:
+    """
     dataset_path = f"dataset/{animal}"
     if not os.path.exists(new_dataset):
         os.mkdir(new_dataset)
@@ -125,7 +157,13 @@ def copy_dataset(animal, new_dataset): # по dataset/{animal} собирает�
         shutil.copy(f'{dataset_path}/{image}', f'{new_dataset}/{animal}_{image.split(".")[0]}.jpg')
 
 
-def copy_dataset_rand(new_dataset: str, path: str):
+def copy_dataset_rand(new_dataset: str, path: str) -> None:
+    """
+
+    :param new_dataset:
+    :param path:
+    :return:
+    """
     if not os.path.exists(new_dataset):
         os.mkdir(new_dataset)
 
@@ -147,21 +185,38 @@ def copy_dataset_rand(new_dataset: str, path: str):
 
 
 count_t, count_l = 0, 0
-def return_next(animal):
+def return_next(animal) -> str:
+    """
+    The function runs through a list of values
+    and returns the following on every call
+
+    :param animal:
+    :return:
+    """
     global count_t, count_l
     if animal == tig:
-        if count_t > len(os.listdir(f'{os.getcwd()}/dataset/{animal}')): return None
+        if count_t > len(os.listdir(f'{os.getcwd()}/dataset/{animal}')): return Optional[None]
         rstr = make_name(count_t)
         count_t += 1
     elif animal == leo:
-        if count_l > len(os.listdir(f'{os.getcwd()}/dataset/{animal}')): return None
+        if count_l > len(os.listdir(f'{os.getcwd()}/dataset/{animal}')): return Optional[None]
         rstr = make_name(count_l)
         count_l += 1
     return f'{os.getcwd()}/dataset/{animal}/{rstr}.jpg'
 
+# def func1(elem):
+#     return int(elem.split('.')[0])
+#
+# def sotring(lst):
+#     return lst.sort(key=func1)
 
 class Iterator:
-    def __init__(self, animal_list, lim):
+    '''
+    class Iterator iterates through a list of values
+    and returns the following on every call
+    '''
+    def __init__(self, animal_list, lim, animal):
+        self.animal = animal
         self.animal_list = animal_list
         self.lim = lim
         self.count = 0
@@ -169,26 +224,20 @@ class Iterator:
     def __next__(self):
         if self.count < self.lim:
             self.count += 1
-            return f'{os.getcwd()}/dataset/{tig}'+self.animal_list[self.count - 1]
+            if self.animal == 't': return f'dataset/tiger/'+self.animal_list[self.count - 1]
+            elif self.animal == 'l': return f'dataset/leopard/'+self.animal_list[self.count - 1]
         else:
             raise StopIteration
 
-# photos = Iterator(lst, 7)
-#
-# try:
-#     print(next(photos))
-# except StopIteration:
-#     print("it's all")
 
-
-def main_second():
+def main_second() -> None:
     """1"""
     # annotation_maker('dataset', 'annotation.csv', tig + '/', leo + '/')
-    """2"""
+    # """2"""
     # copy_dataset(tig, 'new_dataset_task_2')
     # copy_dataset(leo, 'new_dataset_task_2')
     # annotation_maker('new_dataset_task_2', '0new_dataset_annotation.csv', '', '')
-    """3"""
+    # """3"""
     # copy_dataset_rand('new_dataset_task_3', '0new_dataset_annotation.csv')
     """4"""
     # for i in range(1210):
@@ -197,8 +246,8 @@ def main_second():
     #     print(return_next(leo))
     """5"""
     dir_t, dir_l = f'{os.getcwd()}/dataset/{tig}', f'{os.getcwd()}/dataset/{leo}'
-    iterator_tiger = Iterator(os.listdir(dir_t), len(os.listdir(dir_t)))
-    iterator_leo = Iterator(os.listdir(dir_l), len(os.listdir(dir_l)))
+    iterator_tiger = Iterator(os.listdir(dir_t), len(os.listdir(dir_t)), 't')
+    iterator_leo = Iterator(os.listdir(dir_l), len(os.listdir(dir_l)), 'l')
     try:
         for i in range(1210):
             print(next(iterator_tiger))
@@ -210,6 +259,10 @@ def main_second():
 
 
 if __name__ == "__main__":
+    """
+    function main_second launch any functions
+    to complete the tasks 
+    """
     main_second()
 
 
