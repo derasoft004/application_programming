@@ -117,12 +117,12 @@ def loop_for_writing(csvfile, full_list_t: list, list_t: list,
         if i < len(list_l) and l in list_l[i]: csvfile.writerow({'Full path': full_list_l[i], 'Relative path': list_l[i], 'class': l})
 
 
-def annotation_maker(dataset, path: str, t, l) -> None:
+def annotation_maker(dataset, name: str, t, l) -> None:
     """
     It makes annotations for some assignments
 
     :param dataset:
-    :param path:
+    :param name:
     :param t:
     :param l:
     :return:
@@ -131,7 +131,35 @@ def annotation_maker(dataset, path: str, t, l) -> None:
         list_dataset(dataset, t)[1], list_dataset(dataset, l)[1]
     list_full_path_images_tiger, list_full_path_images_leopard = \
         list_dataset(dataset, t)[0], list_dataset(dataset, l)[0]
-    with open(dataset+'/'+path, 'w', newline='') as csvfile:
+    with open(dataset+'/'+name, 'w', newline='') as csvfile:
+        fieldnames = ['Full path', 'Relative path', 'class']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        loop_for_writing(writer, list_full_path_images_tiger, list_relative_path_images_tiger,
+                         list_full_path_images_leopard, list_relative_path_images_leopard,
+                         tig, leo)
+
+def annotation_maker2(dataset, path: str, name: str, t, l) -> None:
+    """
+    It makes annotations for some assignments
+
+    :param dataset:
+    :param path:
+    :param name:
+    :param t:
+    :param l:
+    :return:
+    """
+    list_relative_path_images_tiger, list_relative_path_images_leopard = \
+        list_dataset(dataset, t)[1], list_dataset(dataset, l)[1]
+    list_full_path_images_tiger, list_full_path_images_leopard = \
+        list_dataset(dataset, t)[0], list_dataset(dataset, l)[0]
+    if path == '': path = 'file_annotation'
+    if not os.path.exists(path): os.mkdir(path)
+    file = open(path+'/'+name, 'w')
+    file.close()
+
+    with open(path+'/'+name, 'w', newline='') as csvfile:
         fieldnames = ['Full path', 'Relative path', 'class']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
@@ -156,6 +184,23 @@ def copy_dataset(animal, new_dataset) -> None:
     for image in image_list:
         shutil.copy(f'{dataset_path}/{image}', f'{new_dataset}/{animal}_{image.split(".")[0]}.jpg')
 
+def copy_dataset2(path, animal, new_dataset) -> None:
+    """
+    по dataset/{animal} собирается и копируется все содержимое в new_dataset
+
+    :param path:
+    :param animal:
+    :param new_dataset:
+    :return:
+    """
+    dataset_path = "new_dataset"
+    if path != '': dataset_path = path
+    if not os.path.exists(dataset_path):
+        os.mkdir(dataset_path)
+
+    image_list = os.listdir(f'dataset/{animal}')
+    for image in image_list:
+        shutil.copy(f'dataset/{animal}/{image}', f'{dataset_path}/{animal}_{image.split(".")[0]}.jpg')
 
 def copy_dataset_rand(new_dataset: str, path: str) -> None:
     """
@@ -168,6 +213,31 @@ def copy_dataset_rand(new_dataset: str, path: str) -> None:
         os.mkdir(new_dataset)
 
     with open(new_dataset + '/' + path, 'w', newline='') as csvfile:
+        fieldnames = ['Full path', 'Relative path', 'class']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for animal in [tig, leo]:
+            dataset_path = f"dataset/{animal}"
+
+            image_list = os.listdir(dataset_path)
+            for image in image_list:
+                num = randint(0, 10000)
+                relative_path_animal = f'{new_dataset}/{num}.jpg'
+                full_path_animal = f'{os.getcwd()}/{relative_path_animal}'
+                shutil.copy(f'{dataset_path}/{image}', f'{new_dataset}/{num}.jpg')
+                writer.writerow({'Full path': full_path_animal, 'Relative path': relative_path_animal, 'class': animal})
+
+def copy_dataset_rand2(new_dataset: str, name: str) -> None:
+    """
+    :param new_dataset:
+    :param name:
+    :return:
+    """
+    if not os.path.exists(new_dataset):
+        os.mkdir(new_dataset)
+
+    with open(new_dataset + '/' + name, 'w', newline='') as csvfile:
         fieldnames = ['Full path', 'Relative path', 'class']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
@@ -233,11 +303,12 @@ class Iterator:
 def main_second() -> None:
     """1"""
     # annotation_maker('dataset', 'annotation.csv', tig + '/', leo + '/')
-    # """2"""
+    """2"""
     # copy_dataset(tig, 'new_dataset_task_2')
     # copy_dataset(leo, 'new_dataset_task_2')
     # annotation_maker('new_dataset_task_2', '0new_dataset_annotation.csv', '', '')
-    # """3"""
+    """3"""
+    # annotation_maker('new_dataset_task_3', '01new_dataset_annotation.csv', '', '')
     # copy_dataset_rand('new_dataset_task_3', '0new_dataset_annotation.csv')
     """4"""
     # for i in range(1210):
@@ -245,17 +316,17 @@ def main_second() -> None:
     # for i in range(5):
     #     print(return_next(leo))
     """5"""
-    dir_t, dir_l = f'{os.getcwd()}/dataset/{tig}', f'{os.getcwd()}/dataset/{leo}'
-    iterator_tiger = Iterator(os.listdir(dir_t), len(os.listdir(dir_t)), 't')
-    iterator_leo = Iterator(os.listdir(dir_l), len(os.listdir(dir_l)), 'l')
-    try:
-        for i in range(1210):
-            print(next(iterator_tiger))
-    except StopIteration: print(None)
-    try:
-        for i in range(5):
-            print(next(iterator_leo))
-    except StopIteration: print(None)
+    # dir_t, dir_l = f'{os.getcwd()}/dataset/{tig}', f'{os.getcwd()}/dataset/{leo}'
+    # iterator_tiger = Iterator(os.listdir(dir_t), len(os.listdir(dir_t)), 't')
+    # iterator_leo = Iterator(os.listdir(dir_l), len(os.listdir(dir_l)), 'l')
+    # try:
+    #     for i in range(1210):
+    #         print(next(iterator_tiger))
+    # except StopIteration: print(None)
+    # try:
+    #     for i in range(5):
+    #         print(next(iterator_leo))
+    # except StopIteration: print(None)
 
 
 if __name__ == "__main__":
